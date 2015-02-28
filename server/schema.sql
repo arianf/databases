@@ -3,15 +3,21 @@
 USE chat;
 
 CREATE TABLE messages (
-  objectId int(11) NOT NULL auto_increment,
-  username VARCHAR(256),
+  messageid int(11) NOT NULL auto_increment,
+  userid  int(11),
   message  TEXT,
-  roomname VARCHAR(256) ,
-  PRIMARY KEY (objectId)
+  roomname VARCHAR(255),
+  PRIMARY KEY (messageid)
   /* Describe your table here.*/
 );
 
 /* Create other tables and define schemas for them here! */
+
+CREATE TABLE users (
+  userid int(11) NOT NULL auto_increment,
+  username VARCHAR(255),
+  PRIMARY KEY (userid)
+);
 
 
 
