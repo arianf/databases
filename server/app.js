@@ -21,6 +21,12 @@ app.use(parser.json());
 // Set up our routes
 app.use("/classes", router);
 
+// Get
+
+app.get('/', function(){
+  console.log('im on the home page');
+})
+
 // Serve the client files
 app.use(express.static(__dirname + "/../client"));
 
