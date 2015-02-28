@@ -1,10 +1,9 @@
 var db = require('../db');
 
-
 module.exports = {
   messages: {
     get: function (callback) {
-      db.query('SELECT * FROM messages', function(err, rows, fields){
+      db.query('SELECT messages.messageid, users.username, messages.message, messages.roomname FROM messages INNER JOIN users on users.userid = messages.userid', function(err, rows, fields){
         if (err){ throw err; }
         callback(rows);
       });
@@ -13,20 +12,48 @@ module.exports = {
     post: function (args, completed) {
 
       db.query('SELECT userid FROM users WHERE username = ?', [args[0]], function(err, rows){
-        var userid = rows[0].userid;
-        args[0] = userid;
-        if(userid === undefined){
-          console.log('cant find userid');
+        var userid;
+        if(rows[0] === undefined){
+          userid ='';
+        }else{
+          userid = rows[0].userid;
+        }
+
+        // replacing username with userid
+
+        // check to see if usernname === ''
+        if(args[0] === ''){
+          console.log('cant find username');
           completed();
         }else{
-          db.query('INSERT INTO messages (userid, message, roomname) VALUES ( ?, ?, ?)', args, function(err){
-            if(err){
-              console.log('| failed insert message |');
-            }else {
-              console.log('| inserted message |');
-            }
-            completed();
-          });
+
+          // username was something, but didn't exists in database
+          if(userid === ''){
+            module.exports.users.post([args[0]], function(result){
+              args[0] = result.insertId;
+              db.query('INSERT INTO messages (userid, message, roomname) VALUES ( ?, ?, ?)', args, function(err){
+                if(err){
+                  console.log('| failed insert message |');
+                }else {
+                  console.log('| inserted message |');
+                }
+                completed();
+              });
+            });
+          }else{
+            args[0] = userid;
+            db.query('INSERT INTO messages (userid, message, roomname) VALUES ( ?, ?, ?)', args, function(err){
+              if(err){
+                console.log('| failed insert message |');
+              }else {
+                console.log('| inserted message |');
+              }
+              completed();
+            });
+          }
+
+          //
+
         }
 
       });
@@ -53,13 +80,13 @@ module.exports = {
         });
 
         if(!exists){
-          db.query('INSERT INTO users (username) VALUES (?)', args, function(err){
+          db.query('INSERT INTO users (username) VALUES (?)', args, function(err, result){
             if(err){
               console.log('| failed insert user | ');
             }else{
               console.log('| inserted user |');
             }
-            completed();
+            completed(result);
           });
         }else{
           console.log('user already exists');

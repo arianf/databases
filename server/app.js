@@ -15,9 +15,7 @@ module.exports.app = app;
 app.set("port", 3000);
 
 // parse application/x-www-form-urlencoded
-app.use(parser.urlencoded({ extended: false }))
-
-
+app.use(parser.urlencoded({ extended: false }));
 
 // Logging and parsing
 app.use(morgan('dev'));
@@ -26,11 +24,6 @@ app.use(parser.json());
 // Set up our routes
 app.use("/classes", router);
 
-// Get
-
-app.get('/', function(){
-  console.log('im on the home page');
-})
 
 // Serve the client files
 app.use(express.static(__dirname + "/../client"));
