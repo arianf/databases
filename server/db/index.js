@@ -14,16 +14,38 @@ var mysql = require('mysql');
 // connection.connect();
 var Sequelize = require("sequelize");
 
-module.exports.sequelize = new Sequelize("chat", "root", "");
+var orm = new Sequelize("chat", "root", "");
 
-module.exports.User = module.exports.sequelize.define('User', {
-  userid: Sequelize.INTEGER,
+var User = orm.define('user', {
+  userid: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
   username: Sequelize.STRING
+}, {
+  timestamps: false
 });
 
-module.exports.Message = module.exports.sequelize.define('Message', {
-  messageid: Sequelize.INTEGER,
-  userid: Sequelize.INTEGER,
+var Message = orm.define('message', {
+  messageid: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
   message: Sequelize.STRING,
   roomname: Sequelize.STRING
+}, {
+  timestamps: false
 });
+
+User.hasMany(Message, {foreignKey: 'userid'});
+Message.belongsTo(User, {foreignKey: 'userid'});
+
+User.sync();
+Message.sync();
+
+exports.User = User;
+exports.Message = Message;
+
+

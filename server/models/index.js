@@ -1,9 +1,10 @@
 var db = require('../db');
 
+
 module.exports = {
   messages: {
     get: function (callback) {
-      db.query('SELECT messages.messageid, users.username, messages.message, messages.roomname FROM messages INNER JOIN users on users.userid = messages.userid', function(err, rows, fields){
+      db.query('SELECT * FROM messages', function(err, rows, fields){
         if (err){ throw err; }
         callback(rows);
       });
@@ -29,7 +30,7 @@ module.exports = {
 
           // username was something, but didn't exists in database
           if(userid === ''){
-            module.exports.users.post([args[0]], function(result){
+            module.export.users.post([args[0]], function(result){
               args[0] = result.insertId;
               db.query('INSERT INTO messages (userid, message, roomname) VALUES ( ?, ?, ?)', args, function(err){
                 if(err){
@@ -90,7 +91,7 @@ module.exports = {
           });
         }else{
           console.log('user already exists');
-          completed();
+          completed(result);
         }
       });
 
